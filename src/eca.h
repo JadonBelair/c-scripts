@@ -6,3 +6,5 @@
 #define COLS 472
 
 int generate(int left, int center, int right, int rule);
+
+void copy(int source[], int dest[], int size);
