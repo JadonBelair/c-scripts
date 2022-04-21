@@ -1,3 +1,4 @@
+// linux only
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -42,40 +43,41 @@ int main(int argc, char *argv[] ) {
 
     system("clear");
 
-    int grid[ROWS][COLS];
+    int grid[COLS];
+
+    for (int i =0; i < COLS; i++) {
+        grid[i] = 0;
+    }
 
     if (r) {
         // random first row
-        srand(pow(time(NULL), 2));
+        srand(time(NULL) * time(NULL));
         for (int i = 0; i < COLS; i++) {
-            grid[0][i] = ((double) rand() / RAND_MAX) > 0.5 ? 1 : 0;
+            grid[i] = ((double) rand() / RAND_MAX) > 0.5 ? 1 : 0;
         }
     } else {
         // one in middle of first row
-        grid[0][COLS/2] = 1;
+        grid[COLS/2] = 1;
     }
 
-    for (int i = 0; i < ROWS - 1; i++) {
+    int clone[COLS];
 
+    for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
-            int left = ((j == 0) ? grid[i][COLS-1] : grid[i][j-1]);
-            int center = grid[i][j];
-            int right = ((j == (COLS - 1)) ? grid[i][0] : grid[i][j+1]);
+            int left = ((j == 0) ? grid[COLS-1] : grid[j-1]);
+            int center = grid[j];
+            int right = ((j == (COLS - 1)) ? grid[0] : grid[j+1]);
 
             int next_cell = generate(left, center, right, ruleset);
 
-            grid[i+1][j] = next_cell;
+            clone[j] = next_cell;
+
+            wprintf(L"%lc", grid[j] == 1 ? BLACK : WHITE);
         }
 
-    }
+        copy(clone, grid, COLS);
 
-    for (int i = 0; i < ROWS; i++) {
-
-        for (int j = 0; j < COLS; j++) {
-            wprintf(L"%lc", grid[i][j] == 1 ? BLACK : WHITE);
-        }
-
-	    wprintf(L"%lc", 0xA);
+        wprintf(L"%lc", 0xA);
     }
 
     return 0;
@@ -86,4 +88,10 @@ int generate(int left, int center, int right, int rule) {
     int newval = (rule >> shift) & 1;
 
     return newval;
+}
+
+void copy(int source[], int dest[], int size) {
+    for (int i = 0; i < size; i++) {
+        dest[i] = source[i];
+    }
 }
